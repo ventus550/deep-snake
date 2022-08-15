@@ -26,6 +26,15 @@ class DeepNetwork(QNetwork):
 env = Environment(shape = (width, height), vision = vision)
 net = DeepNetwork( (2*vision + 1)**2 )
 agent = Agent(net)
-agent.train(env = env, live = False, scheduler = schedulers.linear, episodes=1000, plot=True)
-agent.save()
+agent.load()
+
+# t = torch.tensor((
+# 	(0, 0, 1),
+# 	(0, 1, 1),
+# 	(0, 0, 0),
+# ), dtype=torch.float)
+# print(agent(t), t)
+
+
+agent.train(env = env, live = False, scheduler = schedulers.zero, episodes=1, plot=False)
 

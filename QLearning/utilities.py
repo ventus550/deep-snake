@@ -2,8 +2,9 @@ import torch
 from random import random, randint
 from collections import namedtuple
 import matplotlib.pyplot as plt
-from seaborn import set_theme
+from tqdm import tqdm
 import contextlib
+from seaborn import set_theme
 set_theme(style = "darkgrid", palette="dark")
 
 @contextlib.contextmanager
@@ -33,12 +34,16 @@ def select_epsilon(policy_net, state, epsilon = 0.5):
 		return select_action(policy_net, state)
 	return randint(0, 3)
 
+def progress_bar(iterable, disabled = False, color="yellow", desc=None):
+	return tqdm(iterable, disable=disabled, colour=color, desc=desc)
+
 def quickplot(*values, legend = [], ylabel = "", path = "./quickplot"):
 	legendary = len(legend) == len(values)
 	for i, v in enumerate(values):
 		plt.plot(v, label = legend[i] if legendary else "")
 	if legendary:
 		plt.legend()
+	plt.tight_layout(pad=3)
 	plt.ylabel(ylabel)
 	plt.savefig(path)
 	plt.clf()

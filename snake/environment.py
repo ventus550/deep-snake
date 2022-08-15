@@ -42,7 +42,7 @@ class Environment:
 		self.score = 0
 		self.vision = vision
 		self.rewards = {
-			Environment.apple: 100,
+			Environment.apple: 10,
 			Environment.empty: 1,
 			Environment.snake_body: 0
 		}
@@ -51,6 +51,7 @@ class Environment:
 
 	def reset(self):
 		self.__init__(tuple(self.shape)[::-1], self.vision)
+		return self
 
 	def spawn_apple(self):
 		assert not self.terminal
