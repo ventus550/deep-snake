@@ -1,4 +1,7 @@
-setup:
+run:
+	find . -type f -name $(run) -exec python {} \+
+
+install:
 	(                                       \
 		python -m venv .;                   \
 		source ./bin/activate;              \
