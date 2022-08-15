@@ -2,7 +2,8 @@
 /include
 /lib
 /lib64
-/__pycache__
+*/__pycache__
 /share
 pyvenv.cfg
+net
 *.png
