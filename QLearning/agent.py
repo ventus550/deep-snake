@@ -1,5 +1,3 @@
-import collections
-from tkinter.ttk import Progressbar
 import torch
 from snake import Environment
 from collections import defaultdict
