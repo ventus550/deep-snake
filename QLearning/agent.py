@@ -39,7 +39,7 @@ class Agent:
 
 	def load(self, path = "./net"):
 		self.policy_net.load(path)
-		# self.target_net.copy_from(self.policy_net) # probably the right way to do this ...
+		self.target_net.copy_from(self.policy_net) # probably the right way to do this ...
 
 	def train(self, scheduler = schedulers.linear, decay = 1.0, episodes = 1, update_frq = 10, live = False, plot = False):
 		history = defaultdict(list)
