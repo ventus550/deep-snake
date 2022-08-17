@@ -5,8 +5,11 @@ from QLearning import QNetwork, Qptimizer, ReplayMemory, schedulers
 from QLearning.utilities import quickplot, ignored, progress_bar
 
 class Agent:
-	def __init__(self, qnet : QNetwork, learning_rate = 0.01, gamma = 0.97, memory = 20000, criterion = torch.nn.MSELoss()):
+	"		vision		-- size of the visible state returned by the get_state() method"
+	def __init__(self, qnet : QNetwork, env : Environment, learning_rate = 0.01, gamma = 0.97, memory = 20000, vision = 1, criterion = torch.nn.MSELoss()):
+		self.env = env
 		self.gamma = gamma
+		self.vision = vision
 		self.memory = ReplayMemory(memory)
 
 		self.policy_net = qnet
@@ -36,19 +39,21 @@ class Agent:
 
 	def load(self, path = "./net"):
 		self.policy_net.load(path)
-		self.target_net.copy_from(self.policy_net) # probably the right way to do this ...
+		# self.target_net.copy_from(self.policy_net) # probably the right way to do this ...
 
-	def train(self, env = Environment(), scheduler = schedulers.linear, decay = None, episodes = 1, update_frq = 10, live = False, plot = False):
+	def train(self, scheduler = schedulers.linear, decay = 1.0, episodes = 1, update_frq = 10, live = False, plot = False):
 		history = defaultdict(list)
-		scheduler = scheduler(decay or episodes)
+		scheduler = scheduler(decay * episodes)
 		with ignored(KeyboardInterrupt):
 			for episode in progress_bar(range(episodes), disabled=live, desc="Training"):
-				game_state = env.reset().get_state()
+				game_state = self.env.reset().get_state(self.vision)
 				epsilon = next(scheduler)
-				while not env.terminal:
-					if live: env.render()
+				while not self.env.terminal:
+					if live or episode == 999:
+						self.env.render()
+						print("epsilon:", epsilon)
 					action = self(game_state, epsilon)
-					old_state, action, reward, game_state = env.action(action)
+					old_state, action, reward, game_state = self.env.action(action)
 
 					# Store the transition in memory
 					self.memory.push(old_state, action, reward, game_state)
@@ -57,17 +62,17 @@ class Agent:
 					self.optimizer(gamma = self.gamma)
 
 				if live: 
-					env.render()
+					self.env.render()
 
-				if plot:
-					history["epsilon"].append(epsilon)
-					history["score"].append(env.score)
-					history["average"].append(sum(history["score"])/len(history["score"]))
-					quickplot(history["epsilon"], ylabel = "Epsilon", path = "./epsilon")
-					quickplot(history["score"], history["average"], legend=["Score", "Average"], path = "./score")
-					self.optimizer.plot_loss("./loss")
-					self.optimizer.plot_loss_variance("./variance")
+				history["epsilon"].append(epsilon)
+				history["score"].append(self.env.score)
+				history["average"].append(sum(history["score"])/len(history["score"]))
 
 				# Update the target network, copying all weights and biases in DQN
 				if episode % update_frq == 0:
 					self.target_net.copy_from(self.policy_net)
+					if plot:
+						quickplot(history["epsilon"], ylabel = "Epsilon", path = "./epsilon")
+						quickplot(history["score"], history["average"], legend=["Score", "Average"], path = "./score")
+						self.optimizer.plot_loss("./loss")
+						self.optimizer.plot_loss_variance("./variance")

@@ -13,8 +13,6 @@ class Environment:
 	and can be accessed individually or as a tensor (channels).
 
 	Attributes:
-		vision		-- size of the visible state returned by the get_state() method
-
 		score		-- the sum of obtained rewards
 
 		shape		-- game's world width and height measured in game blocks
@@ -31,7 +29,7 @@ class Environment:
 		(0, -1)
 	))
 
-	def __init__(self, shape = (30, 30), vision = 1):
+	def __init__(self, shape = (30, 30)):
 		shape = shape[::-1]
 		self.shape = torch.tensor(shape)
 		self.center = self.shape.div(2).long()
@@ -40,7 +38,6 @@ class Environment:
 		self.actn = 0
 		self.terminal = False
 		self.score = 0
-		self.vision = vision
 		self.rewards = {
 			Environment.apple: 10,
 			Environment.empty: 1,
@@ -50,7 +47,7 @@ class Environment:
 		self.spawn_apple()
 
 	def reset(self):
-		self.__init__(tuple(self.shape)[::-1], self.vision)
+		self.__init__(tuple(self.shape)[::-1])
 		return self
 
 	def spawn_apple(self):
@@ -66,9 +63,8 @@ class Environment:
 		shifts = tuple(self.center - self.snake)
 		return self.map.roll(shifts = shifts, dims = (0, 1))
 	
-	def get_state(self):
-		v = self.vision
-		y, x = self.center
+	def get_state(self, vision = 1):
+		(y, x), v = self.center, vision
 		recentered = self.recenter()
 		visible_state = recentered[ y - v : y + v + 1, x - v : x + v + 1 ]
 		return visible_state

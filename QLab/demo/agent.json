@@ -1,0 +1,11 @@
+{
+	"model": "BigConnectedPure",
+	"vision": 1,
+	"learning_rate": 0.01,
+	"gamma": 0.97,
+	"memory": 20000,
+	"training": {
+		"episodes": 1000
+	},
+	"Environment": { "width": 20, "height": 10 }
+}
