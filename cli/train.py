@@ -20,7 +20,6 @@ with ignored(KeyError):
 agent.train(**training)
 agent.save(f"{QLab}/{target}/net")
 
-
 colis = test_collisions(agent)
 mn, mx, mean, var = test_scores(agent)
 with open(f"{QLab}/{target}/stats.json", "w") as outfile:

@@ -5,7 +5,7 @@
 	"gamma": 0.97,
 	"memory": 20000,
 	"training": {
-		"episodes": 1000
+		"episodes": 100
 	},
 	"Environment": { "width": 20, "height": 10 }
 }
