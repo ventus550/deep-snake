@@ -14,5 +14,5 @@ with ignored(KeyboardInterrupt):
 	game_state = env.reset().get_state(agent.vision)
 	while not env.terminal:
 		env.render()
-		env.action(agent(game_state))
+		game_state = env.action(agent(game_state))[3]
 	env.render()

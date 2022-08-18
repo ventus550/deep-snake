@@ -8,7 +8,7 @@ def quickie(agent : Agent):
 	env = agent.env
 	game_state = env.reset().get_state(agent.vision)
 	while not env.terminal:
-		env.action(agent(game_state))
+		game_state = env.action(agent(game_state))[3]
 	return env.score
 
 def test_scores(agent : Agent):

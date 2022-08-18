@@ -49,9 +49,9 @@ class Agent:
 				game_state = self.env.reset().get_state(self.vision)
 				epsilon = next(scheduler)
 				while not self.env.terminal:
-					if live or episode == 999:
+					if live:
 						self.env.render()
-						print("epsilon:", epsilon)
+						print("epsilon:", epsilon, " episodes: ", episode)
 					action = self(game_state, epsilon)
 					old_state, action, reward, game_state = self.env.action(action)
 
@@ -70,6 +70,7 @@ class Agent:
 
 				# Update the target network, copying all weights and biases in DQN
 				if episode % update_frq == 0:
+					
 					self.target_net.copy_from(self.policy_net)
 					if plot:
 						quickplot(history["epsilon"], ylabel = "Epsilon", path = "./epsilon")
