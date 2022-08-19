@@ -1,11 +1,20 @@
 import torch
 from snake import Environment
-from collections import defaultdict
 from QLearning import QNetwork, Qptimizer, ReplayMemory, schedulers
-from QLearning.utilities import quickplot, ignored, progress_bar
+from QLearning.utils import History, quickplot, ignored, progress_bar
 
 class Agent:
-	"		vision		-- size of the visible state returned by the get_state() method"
+	"""
+	Entity capable of interacting with the game environment.
+
+	Attributes:
+		vision		-- perceived game state range
+
+		gamma		-- uncertainty discount for future actions (should be close but not greater than 1.0)
+
+		optimizer	-- used optimization algorithm for the gradient learning method 
+	"""
+
 	def __init__(self, qnet : QNetwork, env : Environment, learning_rate = 0.01, gamma = 0.97, memory = 20000, vision = 1, criterion = torch.nn.MSELoss()):
 		self.env = env
 		self.gamma = gamma
@@ -17,8 +26,8 @@ class Agent:
 		self.target_net.copy_from(self.policy_net)
 		self.target_net.eval()
 
-		# self.optimizer = torch.optim.RMSprop(self.policy_net.parameters(), lr=learning_rate)
-		self.optimizer = torch.optim.Adam(self.policy_net.parameters(), lr=learning_rate)
+		self.optimizer = torch.optim.RMSprop(self.policy_net.parameters(), lr=learning_rate)
+		# self.optimizer = torch.optim.Adam(self.policy_net.parameters(), lr=learning_rate)
 		self.optimizer = Qptimizer(
 			self.memory,
 			self.optimizer,
@@ -28,6 +37,7 @@ class Agent:
 		)
 
 	def __call__(self, state, epsilon = 0):
+		"Choose an action following epsilon-greedy strategy"
 		roll = torch.rand(1).item()
 		if roll >= epsilon:
 			with torch.no_grad():
@@ -41,8 +51,23 @@ class Agent:
 		self.policy_net.load(path)
 		self.target_net.copy_from(self.policy_net) # probably the right way to do this ...
 
+	def train_mode(self):
+		self.policy_net.train()
+		self.target_net.train()
+	
+	def eval_mode(self):
+		self.policy_net.eval()
+		self.target_net.eval()
+
+	def playoff(self, epsilon = 0):
+		game_state = self.env.reset().get_state(self.vision)
+		while not self.env.terminal:
+			action = self(game_state, epsilon)
+			old_state, action, reward, game_state = self.env.action(action)
+			yield old_state, action, reward, game_state
+
 	def train(self, scheduler = schedulers.linear, decay = 1.0, episodes = 1, update_frq = 10, live = False, plot = False):
-		history = defaultdict(list)
+		history = History()
 		scheduler = scheduler(decay * episodes)
 		with ignored(KeyboardInterrupt):
 			for episode in progress_bar(range(episodes), disabled=live, desc="Training"):
@@ -51,7 +76,6 @@ class Agent:
 				while not self.env.terminal:
 					if live:
 						self.env.render()
-						print("epsilon:", epsilon, " episodes: ", episode)
 					action = self(game_state, epsilon)
 					old_state, action, reward, game_state = self.env.action(action)
 
@@ -64,13 +88,14 @@ class Agent:
 				if live: 
 					self.env.render()
 
-				history["epsilon"].append(epsilon)
-				history["score"].append(self.env.score)
-				history["average"].append(sum(history["score"])/len(history["score"]))
+				history.store(
+					epsilon = epsilon,
+					score = self.env.score,
+					average = sum(history["score"])/(len(history["score"]) or 1)
+				)
 
 				# Update the target network, copying all weights and biases in DQN
 				if episode % update_frq == 0:
-					
 					self.target_net.copy_from(self.policy_net)
 					if plot:
 						quickplot(history["epsilon"], ylabel = "Epsilon", path = "./epsilon")

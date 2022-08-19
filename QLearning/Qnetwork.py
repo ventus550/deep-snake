@@ -1,7 +1,6 @@
 import torch
 from torch import nn
 from copy import deepcopy
-# from QLearning.utilities import get_device
 
 
 class QNetwork(nn.Module):

@@ -1,10 +1,10 @@
 import torch
-from random import random, randint
 from collections import namedtuple
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import contextlib
 from seaborn import set_theme
+from collections import defaultdict
 set_theme(style = "darkgrid", palette="dark")
 
 @contextlib.contextmanager
@@ -32,3 +32,11 @@ def quickplot(*values, legend = [], ylabel = "", path = "./quickplot"):
 	plt.ylabel(ylabel)
 	plt.savefig(path)
 	plt.clf()
+
+class History(defaultdict):
+	def __init__(self):
+		super().__init__(list)
+
+	def store(self, **kwargs):
+		for key, value in kwargs.items():
+			self[key].append(value)

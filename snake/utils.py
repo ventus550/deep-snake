@@ -1,6 +1,7 @@
 import torch
 
 R = '\033[1;31m'
+G = '\033[1;32m'
 Y = '\033[1;33m'
 B = '\033[1;34m'
 n = '\033[0m'
@@ -10,6 +11,9 @@ def colored(str : str, color : str):
 
 def red(str : str):
 	return colored(str, R)
+
+def green(str : str):
+	return colored(str, G)
 
 def yellow(str : str):
 	return colored(str, Y)

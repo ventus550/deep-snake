@@ -2,15 +2,12 @@ import torch
 from os import system
 from random import randint
 from itertools import product
-from snake.utils import *
 from time import sleep
+from snake.utils import *
 
 class Environment:
 	"""
-	Stores and manages the game environment and all its agents.
-	The game world is loaded from the file as a plain text during the objects initialization.
-	Game objects are then discretized and split into separate layers (walls, coins, ghosts, distances)
-	and can be accessed individually or as a tensor (channels).
+	Stores and manages the game environment.
 
 	Attributes:
 		score		-- the sum of obtained rewards
@@ -35,9 +32,8 @@ class Environment:
 		self.center = self.shape.div(2).long()
 		self.snake = self.center.clone()
 		self.map = torch.zeros(*self.shape)
-		self.actn = 0
+		self.actn = self.score = 0
 		self.terminal = False
-		self.score = 0
 		self.rewards = {
 			Environment.apple: 10,
 			Environment.empty: 1,
@@ -115,16 +111,20 @@ class Environment:
 		print()
 
 	def __repr__(self):
-		y, x = Environment.directions[self.actn]
-		res = [blue(f"  Score: {self.score}  Moved: {x.item(), y.item()}")]
 		repr = {
 			Environment.empty: '.',
-			Environment.snake_body: yellow('x'),
+			Environment.snake_body: yellow('*'),
 			Environment.apple: red('o')
 		}
+		y, x = Environment.directions[self.actn]
+		res = [blue(f"  Score: {self.score}")]
 		if self.terminal:
 			res.append(red("  terminal"))
-		for _, y, token in self.tiles():
-			if y == 0: res.append('\n\t')
-			res.append(repr[int(token)])
+		for x, y, token in self.tiles():
+			if y == 0:
+				res.append('\n\t')
+			if tuple(self.snake) == (x, y):
+				res.append(green("*"))
+			else:
+				res.append(repr[int(token)])
 		return "".join(res)

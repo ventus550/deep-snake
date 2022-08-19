@@ -1,6 +1,6 @@
 from random import choices
 from collections import deque
-from QLearning.utilities import Transition
+from QLearning.utils import Transition
 
 class ReplayMemory:
     """

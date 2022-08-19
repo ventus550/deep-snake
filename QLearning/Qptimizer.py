@@ -1,6 +1,6 @@
 import torch
 from torch.nn import SmoothL1Loss
-from QLearning.utilities import Transition, quickplot
+from QLearning.utils import Transition, quickplot
 
 class Qptimizer:
 	"""

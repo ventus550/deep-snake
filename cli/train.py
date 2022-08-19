@@ -1,6 +1,6 @@
+import json
 from sys import argv
 from QLearning import schedulers
-import json
 from utils import initialize, fetch, ignored, QLab
 from tests import test_collisions, test_scores
 
