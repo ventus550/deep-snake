@@ -1,4 +1,5 @@
 import torch
+from collections import namedtuple
 
 R = '\033[1;31m'
 G = '\033[1;32m'
@@ -23,3 +24,5 @@ def blue(str : str):
 
 def ftensor(values):
 	return torch.tensor(values, dtype=torch.float32)
+
+Transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state'))

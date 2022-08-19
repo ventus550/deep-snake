@@ -94,10 +94,10 @@ class Environment:
 			self.spawn_apple()
 		
 	def sars_terminal(self, old_state):
-		return old_state, ftensor(self.actn), ftensor(0), None
+		return Transition(old_state, ftensor(self.actn), ftensor(0), None)
 
 	def sars_nonterminal(self, old_state, reward):
-		return old_state, ftensor(self.actn), ftensor(reward), self.get_state()
+		return Transition(old_state, ftensor(self.actn), ftensor(reward), self.get_state())
 
 	def action(self, action : int):
 		assert isinstance(action, int)

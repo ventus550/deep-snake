@@ -12,15 +12,16 @@ class ReplayMemory:
     def __init__(self, capacity):
         self.memory = deque([], maxlen=capacity)
 
-    def push(self, state, action, reward, new_state):
+    def push(self, transition):
         "Save a transition."
+        new_state = transition.next_state
         if new_state is not None:
             new_state = new_state.unsqueeze(0)
         self.memory.append(
             Transition(
-                state.unsqueeze(0),
-                action.unsqueeze(0),
-                reward.unsqueeze(0),
+                transition.state.unsqueeze(0),
+                transition.action.unsqueeze(0),
+                transition.reward.unsqueeze(0),
                 new_state
             )
         )

@@ -26,8 +26,8 @@ class Agent:
 		self.target_net.copy_from(self.policy_net)
 		self.target_net.eval()
 
-		self.optimizer = torch.optim.RMSprop(self.policy_net.parameters(), lr=learning_rate)
-		# self.optimizer = torch.optim.Adam(self.policy_net.parameters(), lr=learning_rate)
+		# self.optimizer = torch.optim.RMSprop(self.policy_net.parameters(), lr=learning_rate)
+		self.optimizer = torch.optim.Adam(self.policy_net.parameters(), lr=learning_rate) # Adam is way better lol
 		self.optimizer = Qptimizer(
 			self.memory,
 			self.optimizer,
@@ -77,10 +77,10 @@ class Agent:
 					if live:
 						self.env.render()
 					action = self(game_state, epsilon)
-					old_state, action, reward, game_state = self.env.action(action)
+					transition = self.env.action(action)
 
 					# Store the transition in memory
-					self.memory.push(old_state, action, reward, game_state)
+					self.memory.push(transition)
 
 					# Perform one step of the optimization (on the policy network)
 					self.optimizer(gamma = self.gamma)
