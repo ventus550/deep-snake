@@ -32,7 +32,7 @@ function retrain {
 }
 
 function train {
-	agent=$(find $SNAKE -type d -name $1) 
+	agent=$(find $SNAKE/QLab -type d -name $1) 
 	if [ -f $agent/net ]; then
 		echo "Model is already trained. Continue?"
 		if [ ! $(read) ]; then
