@@ -1,14 +1,14 @@
+import json
+from sys import argv
 from itertools import product
 from QLearning import Agent
 from snake import Environment
-from utils import progress_bar, ftensor
+from utils import progress_bar, ftensor, initialize, ignored, QLab
 
 
 def quickie(agent : Agent):
 	env = agent.env
-	game_state = env.reset().get_state(agent.vision)
-	while not env.terminal:
-		game_state = env.action(agent(game_state))[3]
+	all(agent.playoff())
 	return env.score
 
 def test_scores(agent : Agent):
@@ -47,3 +47,25 @@ def test_collisions(agent : Agent):
 		env.action(agent(t))
 		fails += env.terminal
 	return (n - fails) / n
+
+try:
+	target = argv[-1]
+	agent = initialize(target)
+	with ignored(FileNotFoundError):
+		agent.load(f"{QLab}/{target}/net")
+	env = agent.env
+except FileNotFoundError:
+	exit("Agent does not exist")
+
+
+colis = test_collisions(agent)
+mn, mx, mean, var = test_scores(agent)
+with open(f"{QLab}/{target}/stats.json", "w") as outfile:
+	data = {
+		"collisions": colis,
+		"min score": mn,
+		"max score": mx,
+		"mean score": mean,
+		"score variance": var
+	}
+	outfile.write(json.dumps(data, indent=4))

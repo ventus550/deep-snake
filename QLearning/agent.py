@@ -59,25 +59,26 @@ class Agent:
 		self.policy_net.eval()
 		self.target_net.eval()
 
-	def playoff(self, epsilon = 0):
+	def playoff(self, epsilon = 0, train = False):
+		if train:
+			self.train_mode()
+		else:
+			self.eval_mode()
 		game_state = self.env.reset().get_state(self.vision)
 		while not self.env.terminal:
 			action = self(game_state, epsilon)
-			old_state, action, reward, game_state = self.env.action(action)
-			yield old_state, action, reward, game_state
+			transition = self.env.action(action)
+			game_state = transition.next_state
+			yield transition
 
 	def train(self, scheduler = schedulers.linear, decay = 1.0, episodes = 1, update_frq = 10, live = False, plot = False):
 		history = History()
 		scheduler = scheduler(decay * episodes)
 		with ignored(KeyboardInterrupt):
 			for episode in progress_bar(range(episodes), disabled=live, desc="Training"):
-				game_state = self.env.reset().get_state(self.vision)
+				if live: self.env.reset().render()
 				epsilon = next(scheduler)
-				while not self.env.terminal:
-					if live:
-						self.env.render()
-					action = self(game_state, epsilon)
-					transition = self.env.action(action)
+				for transition in self.playoff(epsilon = epsilon, train=True):
 
 					# Store the transition in memory
 					self.memory.push(transition)
@@ -85,8 +86,8 @@ class Agent:
 					# Perform one step of the optimization (on the policy network)
 					self.optimizer(gamma = self.gamma)
 
-				if live: 
-					self.env.render()
+					if live: 
+						self.env.render()
 
 				history.store(
 					epsilon = epsilon,

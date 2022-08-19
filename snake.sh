@@ -19,6 +19,10 @@ function play {
 	python $SNAKE/cli/play.py $1
 }
 
+function test {
+	python $SNAKE/cli/test.py $1
+}
+
 function list {
 	if [ $1 ]; then
 		python -m json.tool $SNAKE/QLab/$1/agent.json
@@ -41,6 +45,7 @@ function train {
 	else
 		retrain $1
 	fi
+	test $1
 }
 
 function clean {

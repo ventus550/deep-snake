@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from QLearning import QNetwork
 
 
-class BigConnectedPure(QNetwork):
+class ConnectedPure(QNetwork):
 	def __init__(self, vision):
 		super().__init__()
 		self.connected1 = nn.Linear((2*vision + 1)**2, 512)

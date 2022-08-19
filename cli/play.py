@@ -11,8 +11,6 @@ except FileNotFoundError:
 	exit("Agent does not exist")
 
 with ignored(KeyboardInterrupt):
-	game_state = env.reset().get_state(agent.vision)
-	while not env.terminal:
-		env.render()
-		game_state = env.action(agent(game_state))[3]
-	env.render()
+	agent.env.reset().render()
+	for transition in agent.playoff():
+		agent.env.render()
