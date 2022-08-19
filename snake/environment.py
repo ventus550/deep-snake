@@ -1,6 +1,7 @@
 import torch
 from os import system
 from random import randint
+from random import random
 from itertools import product
 from time import sleep
 from snake.utils import *
@@ -18,7 +19,7 @@ class Environment:
 	"""
 	empty = 0
 	apple = -1
-	snake_body = 1
+	tail = 1
 	directions = torch.tensor((
 		(+1, 0),
 		(0, +1),
@@ -26,20 +27,27 @@ class Environment:
 		(0, -1)
 	))
 
-	def __init__(self, width = 30, height = 30, apples = 1):
+	def __init__(self, width = 30, height = 30, apples = 1, walls = False, vision = 1):
 		self.shape = torch.tensor((height, width))
 		self.center = self.shape.div(2).long()
 		self.snake = self.center.clone()
+		self.vision = vision
 		self.apples = apples
 		self.map = torch.zeros(*self.shape)
+		self.walls = self.map.clone()
 		self.terminal = False
 		self.rewards = {
 			Environment.apple: 10,
 			Environment.empty: 1,
-			Environment.snake_body: 0
+			Environment.tail: 0
 		}
 		self.actn = self.score = self.objects = 0
 		self.move_snake(torch.tensor((0,0)))
+		for y, x, _ in self.tiles():
+			if walls and random() < 0.1:
+				self.put(y, x, object = Environment.tail)
+				self.walls[y, x] = 1
+
 		for _ in range(apples):
 			self.spawn_apple()
 
@@ -50,7 +58,10 @@ class Environment:
 		self.__init__(
 			width = self.shape[1],
 			height = self.shape[0],
-			apples = self.apples)
+			apples = self.apples,
+			vision = self.vision,
+			walls = bool(int(self.walls.count_nonzero()))
+		)
 		return self
 
 	def put(self, y, x, object=0):
@@ -73,8 +84,8 @@ class Environment:
 		shifts = tuple(self.center - self.snake)
 		return self.map.roll(shifts = shifts, dims = (0, 1))
 	
-	def get_state(self, vision = 1):
-		(y, x), v = self.center, vision
+	def get_state(self):
+		(y, x), v = self.center, self.vision
 		recentered = self.recenter()
 		visible_state = recentered[ y - v : y + v + 1, x - v : x + v + 1 ]
 		return visible_state
@@ -84,11 +95,11 @@ class Environment:
 		self.snake %= self.shape
 		pos = tuple(self.snake)
 		tile = self.map[pos].item()
-		self.put(*pos, object = Environment.snake_body)
+		self.put(*pos, object = Environment.tail)
 		return tile
 
 	def interact(self, tile):
-		if tile == Environment.snake_body:
+		if tile == Environment.tail:
 			self.terminal = True
 		elif tile == Environment.apple:
 			self.spawn_apple()
@@ -115,8 +126,8 @@ class Environment:
 
 	def tiles(self):
 		width, height = self.shape
-		for x, y in product(range(width), range(height)):
-			yield x, y, self.map[x, y]
+		for y, x in product(range(width), range(height)):
+			yield y, x, self.map[y, x]
 
 	def render(self, wait = 0.5):
 		sleep(wait)
@@ -127,7 +138,7 @@ class Environment:
 	def __repr__(self):
 		repr = {
 			Environment.empty: '.',
-			Environment.snake_body: yellow('*'),
+			Environment.tail: yellow('*'),
 			Environment.apple: red('o')
 		}
 		y, x = Environment.directions[self.actn]
@@ -139,6 +150,8 @@ class Environment:
 				res.append('\n\t')
 			if tuple(self.snake) == (x, y):
 				res.append(green("*"))
+			elif self.walls[x, y]:
+				res.append(blue("x"))
 			else:
 				res.append(repr[int(token)])
 		return "".join(res)

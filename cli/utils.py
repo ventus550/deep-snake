@@ -1,6 +1,7 @@
 import os
 import json
 from snake import *
+from collections import defaultdict
 from QLearning.utils import *
 from QLearning import Agent, models
 
@@ -31,3 +32,11 @@ def initialize(agent : str):
 		vision=data["vision"]
 	)
 	return agent
+
+class History(defaultdict):
+	def __init__(self):
+		super().__init__(list)
+
+	def store(self, **kwargs):
+		for key, value in kwargs.items():
+			self[key].append(value)

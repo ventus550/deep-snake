@@ -11,6 +11,5 @@ except FileNotFoundError:
 	exit("Agent does not exist")
 
 with ignored(KeyboardInterrupt):
-	agent.env.reset().render()
 	for transition in agent.playoff():
 		agent.env.render()

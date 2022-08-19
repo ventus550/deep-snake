@@ -1,7 +1,6 @@
 import torch
 from snake import Environment
-from QLearning import QNetwork, Qptimizer, ReplayMemory, schedulers
-from QLearning.utils import History, quickplot, ignored, progress_bar
+from QLearning import QNetwork, Qptimizer, ReplayMemory
 
 class Agent:
 	"""
@@ -12,13 +11,14 @@ class Agent:
 
 		gamma		-- uncertainty discount for future actions (should be close but not greater than 1.0)
 
-		optimizer	-- used optimization algorithm for the gradient learning method 
+		optimizer	-- optimization algorithm used for the gradient learning method 
 	"""
 
 	def __init__(self, qnet : QNetwork, env : Environment, learning_rate = 0.01, gamma = 0.97, memory = 20000, vision = 1, criterion = torch.nn.MSELoss()):
 		self.env = env
-		self.gamma = gamma
 		self.vision = vision
+		self.env.vision = vision
+		self.gamma = gamma
 		self.memory = ReplayMemory(memory)
 
 		self.policy_net = qnet
@@ -64,42 +64,9 @@ class Agent:
 			self.train_mode()
 		else:
 			self.eval_mode()
-		game_state = self.env.reset().get_state(self.vision)
+		game_state = self.env.reset().get_state()
 		while not self.env.terminal:
 			action = self(game_state, epsilon)
 			transition = self.env.action(action)
 			game_state = transition.next_state
 			yield transition
-
-	def train(self, scheduler = schedulers.linear, decay = 1.0, episodes = 1, update_frq = 10, live = False, plot = False):
-		history = History()
-		scheduler = scheduler(decay * episodes)
-		with ignored(KeyboardInterrupt):
-			for episode in progress_bar(range(episodes), disabled=live, desc="Training"):
-				if live: self.env.reset().render()
-				epsilon = next(scheduler)
-				for transition in self.playoff(epsilon = epsilon, train=True):
-
-					# Store the transition in memory
-					self.memory.push(transition)
-
-					# Perform one step of the optimization (on the policy network)
-					self.optimizer(gamma = self.gamma)
-
-					if live: 
-						self.env.render()
-
-				history.store(
-					epsilon = epsilon,
-					score = self.env.score,
-					average = sum(history["score"])/(len(history["score"]) or 1)
-				)
-
-				# Update the target network, copying all weights and biases in DQN
-				if episode % update_frq == 0:
-					self.target_net.copy_from(self.policy_net)
-					if plot:
-						quickplot(history["epsilon"], ylabel = "Epsilon", path = "./epsilon")
-						quickplot(history["score"], history["average"], legend=["Score", "Average"], path = "./score")
-						self.optimizer.plot_loss("./loss")
-						self.optimizer.plot_loss_variance("./variance")
