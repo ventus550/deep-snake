@@ -38,7 +38,8 @@ def blocks(vis):
 
 def test_collisions(agent : Agent):
 	vis = agent.vision
-	env = Environment(shape = (2*vis + 1,) * 2)
+	vsd = 2*vis + 1
+	env = Environment(width = vsd, height = vsd)
 	fails = 0
 	for n, t in enumerate(progress_bar(list(blocks(vis)), color="blue", desc="Testing collisions")):
 		env.reset()

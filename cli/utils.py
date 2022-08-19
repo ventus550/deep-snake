@@ -18,12 +18,7 @@ def fetch(agent : str, data : str):
 
 def initialize(agent : str):
 	data = fetch(agent, "agent")
-	env = Environment(
-		shape = (
-			data["Environment"]["width"],
-			data["Environment"]["height"]
-		)
-	)
+	env = Environment(**data["Environment"])
 
 	model = models.__dict__[data["model"]]
 	net = model(data["vision"])

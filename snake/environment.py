@@ -26,34 +26,48 @@ class Environment:
 		(0, -1)
 	))
 
-	def __init__(self, shape = (30, 30)):
-		shape = shape[::-1]
-		self.shape = torch.tensor(shape)
+	def __init__(self, width = 30, height = 30, apples = 1):
+		self.shape = torch.tensor((height, width))
 		self.center = self.shape.div(2).long()
 		self.snake = self.center.clone()
+		self.apples = apples
 		self.map = torch.zeros(*self.shape)
-		self.actn = self.score = 0
 		self.terminal = False
 		self.rewards = {
 			Environment.apple: 10,
 			Environment.empty: 1,
 			Environment.snake_body: 0
 		}
+		self.actn = self.score = self.objects = 0
 		self.move_snake(torch.tensor((0,0)))
-		self.spawn_apple()
+		for _ in range(apples):
+			self.spawn_apple()
+
+	def __len__(self):
+		return (self.shape[0] * self.shape[1]).item()
 
 	def reset(self):
-		self.__init__(tuple(self.shape)[::-1])
+		self.__init__(
+			width = self.shape[1],
+			height = self.shape[0],
+			apples = self.apples)
 		return self
+
+	def put(self, y, x, object=0):
+		tile = self.map[y, x].item()
+		self.objects += tile == 0
+		# self.objects -= tile != 0 and object == 0
+		self.map[y, x] = object
 
 	def spawn_apple(self):
 		assert not self.terminal
+		if self.objects >= len(self): return
 		y = randint(0, self.shape[0] - 1)
 		x = randint(0, self.shape[1] - 1)
 		if self.map[y, x]:
 			self.spawn_apple()
 		else:
-			self.map[y, x] = Environment.apple
+			self.put(y, x, object = Environment.apple)
 
 	def recenter(self):
 		shifts = tuple(self.center - self.snake)
@@ -70,7 +84,7 @@ class Environment:
 		self.snake %= self.shape
 		pos = tuple(self.snake)
 		tile = self.map[pos].item()
-		self.map[pos] = Environment.snake_body
+		self.put(*pos, object = Environment.snake_body)
 		return tile
 
 	def interact(self, tile):
