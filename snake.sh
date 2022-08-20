@@ -32,6 +32,7 @@ function list {
 }
 
 function retrain {
+	echo $1
 	python $SNAKE/cli/train.py $1
 }
 
@@ -48,8 +49,17 @@ function train {
 	test $1
 }
 
+function session {
+	for dir in $SNAKE/QLab/*
+	do
+		retrain $( basename "$dir" )
+	done
+}
+
 function clean {
 	find $SNAKE -type d -name __pycache__ -exec rm -r {} \+
+	find $SNAKE/QLab -type f -name "*.png" -exec rm -r {} \+
+	find $SNAKE/QLab -type f -name "net" -exec rm -r {} \+
 	rm -rf share
 }
 

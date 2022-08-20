@@ -1,0 +1,15 @@
+{
+	"model": "Simple",
+	"vision": 1,
+	"learning_rate": 0.01,
+	"gamma": 0.5,
+	"memory": 2000,
+	"training": {
+		"episodes": 100000,
+		"update_frq": 10,
+		"scheduler": "linear",
+		"decay": 1,
+		"plot": true
+	},
+	"Environment": { "width": 20, "height": 10 }
+}
