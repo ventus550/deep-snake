@@ -1,11 +1,14 @@
 {
-	"model": "ConnectedPure",
+	"model": "Convolutions",
 	"vision": 1,
 	"learning_rate": 0.01,
 	"gamma": 0.97,
-	"memory": 20000,
+	"memory": 1000000,
 	"training": {
-		"episodes": 100
+		"episodes": 1000,
+		"decay": 1,
+		"scheduler": "linear",
+		"plot": true
 	},
 	"Environment": { "width": 20, "height": 10 }
 }

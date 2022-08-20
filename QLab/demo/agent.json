@@ -1,11 +1,11 @@
 {
-	"model": "Convolutions",
+	"model": "Simple",
 	"vision": 1,
 	"learning_rate": 0.01,
-	"gamma": 0.97,
-	"memory": 1000000,
+	"gamma": 0.999,
+	"memory": 2000,
 	"training": {
-		"episodes": 1000,
+		"episodes": 10000,
 		"decay": 1,
 		"scheduler": "linear",
 		"plot": true
