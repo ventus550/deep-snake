@@ -31,3 +31,6 @@ def quickplot(*values, legend = [], ylabel = "", path = "./quickplot"):
 	plt.ylabel(ylabel)
 	plt.savefig(path)
 	plt.clf()
+
+def flattened(vision):
+	return (2*vision + 1)**2

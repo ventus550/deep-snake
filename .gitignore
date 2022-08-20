@@ -7,5 +7,6 @@
 /private
 pyvenv.cfg
 net
-*.png
+epsilon.png
+variance.png
 activate

@@ -1,7 +1,8 @@
 {
     "collisions": 0.6233183856502242,
-    "min score": 0,
-    "max score": 130,
-    "mean score": 34,
-    "score variance": 934
+    "min score": 190,
+    "max score": 253,
+    "mean score": 211,
+    "score variance": 227,
+    "walls": false
 }

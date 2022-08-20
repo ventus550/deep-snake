@@ -50,4 +50,5 @@ with ignored(KeyError):
 	training["scheduler"] = schedulers.__dict__[training["scheduler"]]
 
 train(agent, f"{QLab}/{target}", **training)
+agent.env.render()
 agent.save(f"{QLab}/{target}/net")
