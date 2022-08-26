@@ -93,7 +93,6 @@ class Dueling(QNetwork):
 		values = self.value_stream(features)
 		advantages = self.advantage_stream(features)
 		qvals = values + (advantages - advantages.mean())
-		print(x); exit()
 		return qvals
 
 class Convolutions(QNetwork):

@@ -6,8 +6,8 @@
 	"memory": 2000,
 	"training": {
 		"episodes": 100000,
-		"update_frq": 10,
-		"scheduler": "linear",
+		"update_frq": 10000,
+		"scheduler": "sigmoidal",
 		"decay": 1,
 		"plot": true
 	},

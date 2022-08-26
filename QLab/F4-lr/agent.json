@@ -1,7 +1,7 @@
 {
-	"model": "Convolutions",
+	"model": "FullyConnected",
 	"vision": 1,
-	"learning_rate": 0.01,
+	"learning_rate": 0.001,
 	"gamma": 0.97,
 	"memory": 2000,
 	"training": {

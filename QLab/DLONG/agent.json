@@ -1,11 +1,11 @@
 {
-	"model": "Convolutions",
+	"model": "Dueling",
 	"vision": 1,
 	"learning_rate": 0.01,
 	"gamma": 0.97,
 	"memory": 2000,
 	"training": {
-		"episodes": 100000,
+		"episodes": 1000000,
 		"update_frq": 10000,
 		"scheduler": "sigmoidal",
 		"decay": 1,
