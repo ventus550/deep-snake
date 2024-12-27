@@ -3,7 +3,7 @@ SNAKE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 function install {
 	rm -rf bin include lib lib64
-	python -m venv $SNAKE
+	python3.10 -m venv $SNAKE
 	echo "export PYTHONPYCACHEPREFIX=/tmp/DeepSnake" >> $SNAKE/bin/activate
 	echo "source "$SNAKE"/snake.sh" >> $SNAKE/bin/activate
 	source $SNAKE/bin/activate

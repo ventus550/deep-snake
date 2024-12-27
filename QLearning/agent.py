@@ -14,7 +14,7 @@ class Agent:
 		optimizer	-- optimization algorithm used for the gradient learning method 
 	"""
 
-	def __init__(self, qnet : QNetwork, env : Environment, learning_rate = 0.01, gamma = 0.97, memory = 20000, vision = 1, criterion = torch.nn.MSELoss()):
+	def __init__(self, qnet : QNetwork, env : Environment, learning_rate = 0.001, gamma = 0.97, memory = 20000, vision = 1, criterion = torch.nn.MSELoss()):
 		self.env = env
 		self.vision = vision
 		self.env.vision = vision
